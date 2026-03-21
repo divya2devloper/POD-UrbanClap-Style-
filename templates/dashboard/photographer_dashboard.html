@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Photographer Dashboard{% endblock %}
+
+{% block content %}
+<div class="photography-gradient py-10">
+    <div class="max-w-7xl mx-auto px-4">
+        <h1 class="text-white text-3xl font-bold">👋 Welcome, {{ request.user.get_full_name|default:request.user.username }}</h1>
+        <p class="text-teal-300 mt-1">Your PhotographyHub dashboard</p>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 py-8">
+    {% if photographer %}
+    <!-- Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white rounded-2xl shadow-sm p-5 text-center border border-gray-100">
+            <div class="text-3xl font-bold text-teal-700">{{ photographer.total_jobs }}</div>
+            <div class="text-sm text-gray-500 mt-1">Total Jobs</div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-5 text-center border border-gray-100">
+            <div class="text-3xl font-bold text-yellow-500">⭐ {{ photographer.rating|floatformat:1 }}</div>
+            <div class="text-sm text-gray-500 mt-1">Rating</div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-5 text-center border border-gray-100">
+            <div class="text-3xl font-bold text-teal-700">{{ photographer.max_travel_radius|floatformat:0 }}km</div>
+            <div class="text-sm text-gray-500 mt-1">Travel Radius</div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm p-5 text-center border border-gray-100">
+            <div class="text-3xl font-bold {% if photographer.is_available %}text-green-500{% else %}text-red-400{% endif %}">
+                {% if photographer.is_available %}🟢{% else %}🔴{% endif %}
+            </div>
+            <div class="text-sm text-gray-500 mt-1">{% if photographer.is_available %}Available{% else %}Unavailable{% endif %}</div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <a href="{% url 'bookings:job_feed' %}" class="bg-teal-700 hover:bg-teal-600 text-white rounded-2xl p-6 transition-colors card-hover">
+            <div class="text-3xl mb-2">🎯</div>
+            <div class="font-bold text-lg">View Job Feed</div>
+            <div class="text-teal-200 text-sm mt-1">See available bookings near you</div>
+        </a>
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div class="text-3xl mb-2">📋</div>
+            <div class="font-bold text-lg text-gray-800">Your Info</div>
+            <div class="text-sm text-gray-500 mt-2 space-y-1">
+                <p>📍 Base: {{ photographer.base_latitude|floatformat:4 }}, {{ photographer.base_longitude|floatformat:4 }}</p>
+                <p>🎓 Experience: {{ photographer.experience_years }} years</p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-20">
+        <div class="text-5xl mb-4">📷</div>
+        <h2 class="text-xl font-bold text-gray-700">Complete Your Profile</h2>
+        <p class="text-gray-500 text-sm mt-2">Set up your photographer profile to start receiving job pings</p>
+        <a href="{% url 'accounts:profile_setup' %}" class="mt-6 inline-block bg-teal-700 hover:bg-teal-600 text-white font-bold px-8 py-3 rounded-xl transition-colors">
+            Setup Profile →
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

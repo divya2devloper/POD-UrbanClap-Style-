@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PhotographyHub{% endblock %} - Ahmedabad's Photography Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        teal: {
+                            850: '#0f4c5c',
+                            900: '#0b3d4a',
+                            950: '#082d38',
+                        },
+                        gold: '#f4b942',
+                    }
+                }
+            }
+        }
+    </script>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen" data-user-id="{{ request.user.id }}">
+
+<!-- Navigation -->
+<nav class="photography-gradient shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <!-- Brand -->
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 bg-yellow-400 rounded-full flex items-center justify-center text-teal-900 font-bold text-lg ripple-animation">
+                    📸
+                </div>
+                <a href="/" class="text-white font-bold text-xl tracking-tight">
+                    Photography<span class="text-yellow-400">Hub</span>
+                </a>
+                <span class="hidden sm:block text-xs text-teal-300 ml-1">Ahmedabad • Gandhinagar</span>
+            </div>
+
+            <!-- Nav Links -->
+            <div class="flex items-center gap-4">
+                {% if request.user.is_authenticated %}
+                    {% if request.user.user_type == 'photographer' %}
+                        <a href="{% url 'bookings:job_feed' %}" class="text-teal-200 hover:text-yellow-400 text-sm font-medium transition-colors">
+                            🎯 Job Feed
+                        </a>
+                    {% else %}
+                        <a href="{% url 'bookings:create_booking' %}" class="text-teal-200 hover:text-yellow-400 text-sm font-medium transition-colors">
+                            📋 Book Now
+                        </a>
+                    {% endif %}
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-teal-900 font-bold text-sm">
+                            {{ request.user.get_full_name|first|upper|default:request.user.username|first|upper }}
+                        </div>
+                        <span class="text-white text-sm hidden sm:block">{{ request.user.get_full_name|default:request.user.username }}</span>
+                        <a href="{% url 'accounts:logout' %}" class="text-teal-300 hover:text-red-400 text-xs ml-2 transition-colors">
+                            Logout
+                        </a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="text-teal-200 hover:text-yellow-400 text-sm font-medium transition-colors">Login</a>
+                    <a href="{% url 'accounts:register' %}" class="bg-yellow-400 hover:bg-yellow-300 text-teal-900 text-sm font-bold px-4 py-2 rounded-full transition-colors">
+                        Sign Up
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Flash Messages -->
+{% if messages %}
+<div class="max-w-7xl mx-auto px-4 pt-4">
+    {% for message in messages %}
+    <div class="flex items-center gap-3 p-3 rounded-lg mb-2 {% if message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800{% elif message.tags == 'success' %}bg-green-50 border border-green-200 text-green-800{% else %}bg-blue-50 border border-blue-200 text-blue-800{% endif %}">
+        <span>{% if message.tags == 'error' %}⚠️{% elif message.tags == 'success' %}✅{% else %}ℹ️{% endif %}</span>
+        <span class="text-sm">{{ message }}</span>
+        <button onclick="this.parentElement.remove()" class="ml-auto text-lg opacity-50 hover:opacity-100">&times;</button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Main Content -->
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Toast Container for WebSocket notifications -->
+<div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col items-end"></div>
+
+<!-- Footer -->
+<footer class="photography-gradient mt-16 py-8">
+    <div class="max-w-7xl mx-auto px-4 text-center text-teal-300 text-sm">
+        <p>© 2024 PhotographyHub · Ahmedabad & Gandhinagar · Built with ❤️ for photographers</p>
+        <p class="mt-1 text-xs text-teal-400">Powered by Expanding Ripple Ping™ technology</p>
+    </div>
+</footer>
+
+{% load static %}
+<script src="{% static 'js/websocket.js' %}"></script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

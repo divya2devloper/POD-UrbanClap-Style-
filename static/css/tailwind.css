@@ -1,0 +1,42 @@
+/* PhotographyHub - Tailwind CSS is loaded via CDN in base.html */
+/* Custom overrides */
+
+.photography-gradient {
+    background: linear-gradient(135deg, #0f4c5c 0%, #0b3d4a 50%, #082d38 100%);
+}
+
+.gold-accent {
+    color: #f4b942;
+}
+
+.gold-bg {
+    background-color: #f4b942;
+}
+
+.card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.ripple-animation {
+    animation: ripple 2s infinite;
+}
+
+@keyframes ripple {
+    0% { box-shadow: 0 0 0 0 rgba(244, 185, 66, 0.4); }
+    70% { box-shadow: 0 0 0 20px rgba(244, 185, 66, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(244, 185, 66, 0); }
+}
+
+.toast-enter {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}

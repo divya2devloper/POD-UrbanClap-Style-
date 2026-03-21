@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking #{{ booking.id }}{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <!-- Header -->
+        <div class="photography-gradient px-8 py-6 flex items-start justify-between">
+            <div>
+                <h1 class="text-white text-xl font-bold">{{ booking.service_name }}</h1>
+                <p class="text-teal-300 text-sm mt-1">Booking #{{ booking.id }}</p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-sm font-bold
+                {% if booking.status == 'Pending' %}bg-yellow-400 text-yellow-900
+                {% elif booking.status == 'Assigned' %}bg-green-400 text-green-900
+                {% elif booking.status == 'Completed' %}bg-blue-400 text-blue-900
+                {% else %}bg-gray-400 text-gray-900{% endif %}">
+                {{ booking.status }}
+            </span>
+        </div>
+
+        <!-- Details -->
+        <div class="px-8 py-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Customer</p>
+                <p class="text-gray-800 font-medium mt-1">{{ booking.customer.get_full_name|default:booking.customer.username }}</p>
+            </div>
+            <div>
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Location</p>
+                <p class="text-gray-800 font-medium mt-1">{{ booking.customer_address }}</p>
+            </div>
+            <div>
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Scheduled At</p>
+                <p class="text-gray-800 font-medium mt-1">{{ booking.scheduled_at|date:"D, d M Y" }} at {{ booking.scheduled_at|time:"h:i A" }}</p>
+            </div>
+            <div>
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Budget</p>
+                <p class="text-gray-800 font-medium mt-1">{% if booking.budget %}₹{{ booking.budget }}{% else %}Open Budget{% endif %}</p>
+            </div>
+            {% if booking.photographer %}
+            <div>
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Assigned Photographer</p>
+                <p class="text-gray-800 font-medium mt-1">{{ booking.photographer.user.get_full_name }}</p>
+            </div>
+            {% endif %}
+            <div>
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Ping Radius</p>
+                <p class="text-gray-800 font-medium mt-1">{{ booking.current_ping_radius|floatformat:0 }} km</p>
+            </div>
+        </div>
+
+        {% if booking.description %}
+        <div class="px-8 pb-6">
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Description</p>
+            <p class="text-gray-600 text-sm">{{ booking.description }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Ping History -->
+        <div class="px-8 pb-8">
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                Photographers Pinged ({{ booking.pings.count }})
+            </p>
+            <div class="space-y-2">
+                {% for ping in booking.pings.all %}
+                <div class="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2">
+                    <span class="text-sm text-gray-700">{{ ping.photographer.user.get_full_name|default:ping.photographer.user.username }}</span>
+                    <span class="text-xs {% if ping.was_accepted %}text-green-600 font-semibold{% else %}text-gray-400{% endif %}">
+                        {% if ping.was_accepted %}✅ Accepted{% else %}Pending{% endif %}
+                    </span>
+                </div>
+                {% empty %}
+                <p class="text-sm text-gray-400 italic">No photographers pinged yet. Ripple expanding...</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a href="{% url 'bookings:create_booking' %}" class="text-teal-600 text-sm hover:underline">← Book another session</a>
+    </div>
+</div>
+{% endblock %}
