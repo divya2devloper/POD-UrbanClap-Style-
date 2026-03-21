@@ -98,12 +98,13 @@
 <!-- Footer -->
 <footer class="photography-gradient mt-16 py-8">
     <div class="max-w-7xl mx-auto px-4 text-center text-teal-300 text-sm">
-        <p>© 2024 PhotographyHub · Ahmedabad & Gandhinagar · Built with ❤️ for photographers</p>
+        <p>© <span id="footer-year"></span> PhotographyHub · Ahmedabad & Gandhinagar · Built with ❤️ for photographers</p>
         <p class="mt-1 text-xs text-teal-400">Powered by Expanding Ripple Ping™ technology</p>
     </div>
 </footer>
 
 {% load static %}
+<script>document.getElementById('footer-year').textContent = new Date().getFullYear();</script>
 <script src="{% static 'js/websocket.js' %}"></script>
 {% block extra_scripts %}{% endblock %}
 </body>
