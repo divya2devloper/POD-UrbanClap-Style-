@@ -1,9 +1,9 @@
-Django==5.0.6
+Django==5.2.12
 channels==4.1.0
 channels-redis==4.2.0
 celery==5.4.0
 redis==5.0.6
 psycopg2-binary==2.9.9
 django-environ==0.11.2
-Pillow==10.4.0
+Pillow==12.1.1
 dj-database-url==2.1.0
