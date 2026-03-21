@@ -11,7 +11,12 @@ from apps.bookings.utils import haversine_distance_km
 def expand_ripple_logic():
     channel_layer = get_channel_layer()
     pending_bookings = Booking.objects.filter(status=Booking.Status.PENDING).select_related("category").only(
-        "id", "customer_latitude", "customer_longitude", "current_ping_radius", "category__name"
+        "id",
+        "customer_latitude",
+        "customer_longitude",
+        "current_ping_radius",
+        "notified_photographer_ids",
+        "category__name",
     )
 
     photographers = list(
@@ -21,15 +26,18 @@ def expand_ripple_logic():
     )
 
     for booking in pending_bookings:
-        next_radius = min(booking.current_ping_radius + 5, 60)
+        next_radius = min(booking.current_ping_radius + 5, 15)
         if next_radius != booking.current_ping_radius:
             booking.current_ping_radius = next_radius
             booking.save(update_fields=["current_ping_radius"])
 
         booking_lat = float(booking.customer_latitude)
         booking_lon = float(booking.customer_longitude)
+        already_notified = set(booking.notified_photographer_ids or [])
 
         for photographer in photographers:
+            if photographer.user_id in already_notified:
+                continue
             distance_km = haversine_distance_km(
                 booking_lat,
                 booking_lon,
@@ -47,3 +55,9 @@ def expand_ripple_logic():
                         "ping_radius_km": booking.current_ping_radius,
                     },
                 )
+                already_notified.add(photographer.user_id)
+
+        updated_notified = list(sorted(already_notified))
+        if updated_notified != (booking.notified_photographer_ids or []):
+            booking.notified_photographer_ids = updated_notified
+            booking.save(update_fields=["notified_photographer_ids"])

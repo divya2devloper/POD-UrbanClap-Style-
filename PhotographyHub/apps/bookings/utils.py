@@ -1,5 +1,7 @@
 from math import atan2, cos, radians, sin, sqrt
 
+from geopy.geocoders import Nominatim
+
 AHMEDABAD_GANDHINAGAR_AREAS = {
     "Satellite": (23.0216, 72.5316),
     "Vastrapur": (23.0395, 72.5260),
@@ -16,6 +18,26 @@ AHMEDABAD_GANDHINAGAR_AREAS = {
 
 def area_to_coordinates(area_name: str):
     return AHMEDABAD_GANDHINAGAR_AREAS.get((area_name or "").strip())
+
+
+def geocode_ahmedabad_address(address: str):
+    """
+    Geocode only Ahmedabad/Gandhinagar addresses for now.
+    This can be extended to other cities in future iterations.
+    """
+    normalized = (address or "").strip()
+    if not normalized:
+        return None
+    known_area = area_to_coordinates(normalized)
+    if known_area:
+        return known_area
+    geolocator = Nominatim(user_agent="PhotographyHub")
+    location = geolocator.geocode(normalized, country_codes="in")
+    if not location:
+        return None
+    if "ahmedabad" not in location.address.lower() and "gandhinagar" not in location.address.lower():
+        return None
+    return (location.latitude, location.longitude)
 
 
 def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:

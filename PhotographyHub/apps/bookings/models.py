@@ -25,9 +25,10 @@ class Booking(models.Model):
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     current_ping_radius = models.PositiveIntegerField(
         default=5,
-        validators=[MinValueValidator(5), MaxValueValidator(60)],
+        validators=[MinValueValidator(5), MaxValueValidator(15)],
         help_text="Current expanding ripple radius in kilometers.",
     )
+    notified_photographer_ids = models.JSONField(default=list, blank=True)
     assigned_photographer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,

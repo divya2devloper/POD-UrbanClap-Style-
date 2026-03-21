@@ -1,10 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
+from unittest.mock import patch
 
 from apps.accounts.models import PhotographerProfile
 from apps.bookings.models import Booking, Category
 from apps.bookings.tasks import expand_ripple_logic
+from apps.bookings.utils import geocode_ahmedabad_address
 
 
 class BookingFlowTests(TestCase):
@@ -50,6 +52,26 @@ class BookingFlowTests(TestCase):
         self.booking.refresh_from_db()
         self.assertEqual(self.booking.current_ping_radius, 10)
 
+    def test_expand_ripple_caps_at_15_km(self):
+        self.booking.current_ping_radius = 15
+        self.booking.save(update_fields=["current_ping_radius"])
+        expand_ripple_logic()
+        self.booking.refresh_from_db()
+        self.assertEqual(self.booking.current_ping_radius, 15)
+
+    @patch("apps.bookings.tasks.async_to_sync")
+    @patch("apps.bookings.tasks.get_channel_layer")
+    def test_expand_ripple_notifies_only_once_per_photographer(self, mock_get_channel_layer, mock_async_to_sync):
+        mock_get_channel_layer.return_value = type("Layer", (), {"group_send": object()})()
+        mocked_sender = mock_async_to_sync.return_value
+        expand_ripple_logic()
+        first_send_count = mocked_sender.call_count
+        self.assertGreater(first_send_count, 0)
+        expand_ripple_logic()
+        self.assertEqual(mocked_sender.call_count, first_send_count)
+        self.booking.refresh_from_db()
+        self.assertEqual(self.booking.notified_photographer_ids, [self.user.id])
+
     def test_homepage_renders_default_category_sections(self):
         self.booking.category = None
         self.booking.save(update_fields=["category"])
@@ -59,3 +81,21 @@ class BookingFlowTests(TestCase):
         self.assertContains(response, "Wedding")
         self.assertContains(response, "Video")
         self.assertContains(response, "Drone Shots")
+
+
+class GeocodingTests(TestCase):
+    def test_geocode_uses_known_ahmedabad_area_without_external_lookup(self):
+        with patch("apps.bookings.utils.Nominatim") as mock_nominatim:
+            coords = geocode_ahmedabad_address("Satellite")
+            self.assertEqual(coords, (23.0216, 72.5316))
+            mock_nominatim.assert_not_called()
+
+    @patch("apps.bookings.utils.Nominatim")
+    def test_geocode_rejects_non_ahmedabad_locations(self, mock_nominatim):
+        geolocator = mock_nominatim.return_value
+        geolocator.geocode.return_value = type(
+            "Location",
+            (),
+            {"latitude": 28.6139, "longitude": 77.2090, "address": "Connaught Place, New Delhi, India"},
+        )()
+        self.assertIsNone(geocode_ahmedabad_address("Connaught Place, New Delhi"))
