@@ -10,13 +10,13 @@ from apps.bookings.utils import haversine_distance_km
 @shared_task
 def expand_ripple_logic():
     channel_layer = get_channel_layer()
-    pending_bookings = Booking.objects.filter(status=Booking.Status.PENDING).only(
-        "id", "customer_latitude", "customer_longitude", "current_ping_radius"
+    pending_bookings = Booking.objects.filter(status=Booking.Status.PENDING).select_related("category").only(
+        "id", "customer_latitude", "customer_longitude", "current_ping_radius", "category__name"
     )
 
     photographers = list(
-        PhotographerProfile.objects.select_related("user").only(
-            "user_id", "base_latitude", "base_longitude", "max_travel_radius"
+        PhotographerProfile.objects.filter(is_available=True).select_related("user").only(
+            "user_id", "base_latitude", "base_longitude", "max_travel_radius", "is_available"
         )
     )
 
@@ -42,6 +42,7 @@ def expand_ripple_logic():
                     {
                         "type": "booking_ping",
                         "booking_id": booking.id,
+                        "service_category": booking.category.name if booking.category else "General Photography",
                         "distance_km": round(distance_km, 2),
                         "ping_radius_km": booking.current_ping_radius,
                     },

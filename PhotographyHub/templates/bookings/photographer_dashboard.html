@@ -28,6 +28,19 @@
     </section>
 
     <section class="ph-list">
+      <article class="ph-card">
+        <h2 class="font-semibold text-slate-900">Quick Categories</h2>
+        <div class="ph-body" style="display:flex;flex-wrap:wrap;gap:8px;">
+          {% for category in category_boxes %}
+            <span class="ph-chip">{{ category.name|default:category }}</span>
+          {% empty %}
+            <span class="text-sm text-slate-500">No categories yet</span>
+          {% endfor %}
+        </div>
+      </article>
+    </section>
+
+    <section class="ph-list">
       {% for booking in bookings %}
         <article class="ph-card">
           <div class="ph-row">
@@ -40,6 +53,7 @@
 
           <div class="ph-body">
             <p>Customer: {{ booking.customer_name|default:"New Client" }}</p>
+            <p>Category: {{ booking.category.name|default:"General Photography" }}</p>
             <p>Ping Radius: {{ booking.current_ping_radius }} km</p>
           </div>
 

@@ -21,6 +21,7 @@ class PhotographerPingConsumer(AsyncJsonWebsocketConsumer):
             {
                 "event": "ping",
                 "booking_id": event["booking_id"],
+                "service_category": event.get("service_category", "General Photography"),
                 "distance_km": event["distance_km"],
                 "ping_radius_km": event["ping_radius_km"],
             }
