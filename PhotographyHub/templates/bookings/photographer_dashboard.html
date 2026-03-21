@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PhotographyHub • Photographer Dashboard</title>
+  <style>
+    body { background: #f1f5f9; font-family: Inter, system-ui, -apple-system, sans-serif; margin: 0; }
+    .ph-shell { max-width: 420px; margin: 0 auto; padding: 18px; }
+    .ph-hero { border-radius: 18px; background: linear-gradient(120deg, #1d4ed8, #4338ca); color: #fff; padding: 20px; box-shadow: 0 10px 30px rgba(30, 64, 175, 0.22); }
+    .ph-muted { color: #e2e8f0; font-size: 14px; line-height: 1.4; }
+    .ph-list { margin-top: 18px; display: grid; gap: 12px; }
+    .ph-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06); padding: 14px; }
+    .ph-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .ph-chip { background: #fef3c7; color: #92400e; font-size: 12px; border-radius: 999px; padding: 4px 8px; font-weight: 600; }
+    .ph-body { margin-top: 10px; color: #334155; font-size: 14px; line-height: 1.45; }
+    .ph-btn { width: 100%; margin-top: 12px; border: none; border-radius: 10px; background: #2563eb; color: #fff; font-weight: 600; padding: 10px 12px; cursor: pointer; }
+    .ph-btn:hover { background: #1d4ed8; }
+    .ph-empty { text-align: center; color: #64748b; border: 1px dashed #cbd5e1; background: #fff; border-radius: 14px; padding: 24px 16px; }
+  </style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+  <main class="ph-shell">
+    <section class="ph-hero">
+      <p class="text-sm uppercase tracking-wide opacity-90">PhotographyHub</p>
+      <h1 class="text-2xl font-bold mt-1">Job Feed</h1>
+      <p class="ph-muted">Ahmedabad + Gandhinagar managed assignments for photographers.</p>
+    </section>
+
+    <section class="ph-list">
+      {% for booking in bookings %}
+        <article class="ph-card">
+          <div class="ph-row">
+            <div>
+              <h2 class="font-semibold text-slate-900">Booking #{{ booking.id }}</h2>
+              <p class="text-sm text-slate-500 mt-1">{{ booking.customer_address|default:"Ahmedabad/Gandhinagar Area" }}</p>
+            </div>
+            <span class="ph-chip">{{ booking.status }}</span>
+          </div>
+
+          <div class="ph-body">
+            <p>Customer: {{ booking.customer_name|default:"New Client" }}</p>
+            <p>Ping Radius: {{ booking.current_ping_radius }} km</p>
+          </div>
+
+          <form action="/bookings/{{ booking.id }}/accept/" method="post" class="mt-4">
+            {% csrf_token %}
+            <button class="ph-btn" type="submit">
+              Accept Job
+            </button>
+          </form>
+        </article>
+      {% empty %}
+        <article class="ph-empty">
+          No pending jobs right now. Keep this page open for live pings.
+        </article>
+      {% endfor %}
+    </section>
+  </main>
+</body>
+</html>
