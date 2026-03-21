@@ -17,6 +17,12 @@ AHMEDABAD_GANDHINAGAR_AREAS = {
 }
 
 
+def area_to_coordinates(area_name: str):
+    if not area_name:
+        return None
+    return AHMEDABAD_GANDHINAGAR_AREAS.get(area_name.strip().lower())
+
+
 class Booking(models.Model):
     class Status(models.TextChoices):
         PENDING = "Pending", "Pending"

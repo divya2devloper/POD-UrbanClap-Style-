@@ -8,6 +8,9 @@ from django.db import transaction
 from apps.accounts.models import PhotographerProfile
 from apps.bookings.models import Booking
 
+RIPPLE_INCREMENT_KM = 5
+RIPPLE_MAX_RADIUS_KM = 60
+
 
 def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     earth_radius_km = 6371.0
@@ -43,7 +46,6 @@ def _notify_photographer(photographer_user_id: int, booking_id: int, distance_km
 @shared_task
 def expand_ripple_logic() -> None:
     pending_bookings = Booking.objects.filter(status=Booking.Status.PENDING)
-    photographers = PhotographerProfile.objects.select_related("user").all()
 
     for booking in pending_bookings:
         with transaction.atomic():
@@ -51,11 +53,15 @@ def expand_ripple_logic() -> None:
             if locked_booking.status != Booking.Status.PENDING:
                 continue
 
-            new_radius = min(locked_booking.current_ping_radius + 5, 60)
+            new_radius = min(
+                locked_booking.current_ping_radius + RIPPLE_INCREMENT_KM,
+                RIPPLE_MAX_RADIUS_KM,
+            )
             if new_radius != locked_booking.current_ping_radius:
                 locked_booking.current_ping_radius = new_radius
                 locked_booking.save(update_fields=["current_ping_radius", "updated_at"])
 
+            photographers = PhotographerProfile.objects.select_related("user").all().iterator()
             for profile in photographers:
                 distance = haversine_km(
                     float(locked_booking.customer_latitude),

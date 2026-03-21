@@ -2,12 +2,19 @@ from django.db import transaction
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
+from apps.accounts.models import PhotographerProfile
 from apps.bookings.models import Booking
 
 
 @require_POST
 @transaction.atomic
 def accept_job(request, booking_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({"detail": "Authentication required."}, status=401)
+
+    if not PhotographerProfile.objects.filter(user=request.user).exists():
+        return JsonResponse({"detail": "Only photographers can accept jobs."}, status=403)
+
     booking = Booking.objects.select_for_update().filter(pk=booking_id).first()
     if booking is None:
         return JsonResponse({"detail": "Booking not found."}, status=404)
