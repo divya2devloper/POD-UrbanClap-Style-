@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PhotographyHub • Ahmedabad & Gandhinagar</title>
+  <style>
+    :root { color-scheme: light; }
+    body { margin:0; font-family: Inter, system-ui, -apple-system, sans-serif; background:#f8fafc; color:#0f172a; }
+    a { color: inherit; text-decoration: none; }
+    .shell { max-width: 1120px; margin: 0 auto; padding: 16px; }
+    .header { position: sticky; top: 0; z-index: 20; background: #ffffffdd; backdrop-filter: blur(8px); border-bottom: 1px solid #e2e8f0; }
+    .header-row { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; padding:12px 0; }
+    .brand { font-weight:800; font-size:20px; color:#1d4ed8; }
+    .book-btn { display:inline-block; border-radius:10px; background:#2563eb; color:#fff; padding:10px 16px; font-weight:700; }
+    .book-btn:hover { background:#1d4ed8; }
+    .nav-links { display:flex; flex-wrap:wrap; gap:8px; }
+    .chip { border:1px solid #cbd5e1; background:#fff; border-radius:999px; padding:7px 12px; font-size:13px; color:#334155; }
+    .hero { margin-top:18px; background: linear-gradient(130deg, #1d4ed8, #0ea5e9); color:#fff; border-radius:20px; padding:24px; box-shadow: 0 16px 30px rgba(30,64,175,.2); }
+    .hero h1 { margin:0 0 6px; font-size:34px; line-height:1.1; }
+    .hero p { margin:0; color:#dbeafe; max-width:740px; }
+    .grid { margin-top:18px; display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:14px; }
+    .card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:16px; box-shadow: 0 6px 16px rgba(15,23,42,.06); }
+    .card h2 { margin:0 0 6px; font-size:20px; }
+    .muted { color:#64748b; font-size:14px; margin:0 0 10px; }
+    .media-grid { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:8px; }
+    .media-box { border-radius:10px; background:#eff6ff; border:1px solid #bfdbfe; color:#1e3a8a; font-size:13px; font-weight:700; text-align:center; padding:12px 8px; }
+    .card .book-btn { margin-top:12px; width:100%; text-align:center; }
+    footer { margin-top:28px; border-top:1px solid #e2e8f0; background:#0f172a; color:#e2e8f0; }
+    .footer-grid { padding:22px 16px; display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:16px; }
+    .footer-title { margin:0 0 8px; font-size:16px; color:#fff; }
+    .footer-links { list-style:none; padding:0; margin:0; display:grid; gap:6px; }
+    .footer-links a { color:#cbd5e1; }
+    .footer-links a:hover { color:#fff; }
+    .footer-book .book-btn { background:#38bdf8; color:#082f49; }
+    .footer-book .book-btn:hover { background:#0ea5e9; color:#fff; }
+    .footer-bottom { border-top:1px solid #1e293b; color:#94a3b8; font-size:13px; padding:10px 16px; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="shell header-row">
+      <a href="/" class="brand">PhotographyHub</a>
+      <nav class="nav-links">
+        {% for category in category_blocks %}
+          <a class="chip" href="#{{ category.slug }}">{{ category.name }}</a>
+        {% endfor %}
+      </nav>
+      <a href="#book-now" class="book-btn">Book Now</a>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero" id="book-now">
+      <h1>Managed Photography Services</h1>
+      <p>Urban-style managed bookings for Ahmedabad and Gandhinagar with fast photographer matching via expanding ripple pings.</p>
+    </section>
+
+    <section class="grid">
+      {% for category in category_blocks %}
+        <article class="card" id="{{ category.slug }}">
+          <h2>{{ category.name }}</h2>
+          <p class="muted">{{ category.description|default:"Professional managed services in your city." }}</p>
+
+          <div class="media-grid">
+            {% for media in category.media_types %}
+              <div class="media-box">{{ media }}</div>
+            {% endfor %}
+          </div>
+
+          <a href="#book-now" class="book-btn">Book Now</a>
+        </article>
+      {% empty %}
+        <article class="card">
+          <h2>Categories coming soon</h2>
+          <p class="muted">Wedding, Product, Event and more will appear here.</p>
+          <div class="media-grid">
+            <div class="media-box">Video</div>
+            <div class="media-box">Photo</div>
+            <div class="media-box">Reel</div>
+            <div class="media-box">Drone Shots</div>
+          </div>
+          <a href="#book-now" class="book-btn">Book Now</a>
+        </article>
+      {% endfor %}
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell footer-grid">
+      <div class="footer-book">
+        <h3 class="footer-title">Ready to book a shoot?</h3>
+        <p class="muted" style="color:#cbd5e1;">Get matched with trusted photographers quickly.</p>
+        <a href="#book-now" class="book-btn">Book Now</a>
+      </div>
+      <div>
+        <h3 class="footer-title">Contact</h3>
+        <p>Email: support@photographyhub.in</p>
+        <p>Phone: +91 79 4000 1234</p>
+      </div>
+      <div>
+        <h3 class="footer-title">Quick Links</h3>
+        <ul class="footer-links">
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Join As Photographer</a></li>
+          <li><a href="#">Terms &amp; Conditions</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Help Center</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="shell footer-bottom">© {% now "Y" %} PhotographyHub — Ahmedabad & Gandhinagar</div>
+  </footer>
+</body>
+</html>
