@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load socialaccount %}
+
+{% block title %}Login • PhotographyHub{% endblock %}
+
+{% block nav_items %}
+<a href="/" class="px-3 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-semibold hover:border-blue-400 hover:text-blue-600 transition-all">Back to Home</a>
+{% endblock %}
+
+{% block content %}
+<main class="min-h-screen pt-20 flex bg-white">
+    <!-- Left Side: Visual Mood -->
+    <div class="hidden lg:block w-1/2 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-600/40 to-indigo-900/60 z-10"></div>
+        <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1200&q=80" 
+             alt="Camera Lens" 
+             class="absolute inset-0 w-full h-full object-cover">
+        
+        <div class="absolute inset-0 z-20 flex flex-col justify-end p-20 text-white">
+            <h2 class="text-6xl font-900 mb-6 leading-tight">Every Frame <br><span class="text-blue-300">Tells a Story.</span></h2>
+            <p class="text-xl text-blue-100 max-w-sm font-600 mb-12">Login to manage your bookings and connect with top-tier photography talent in Gandhinagar & Ahmedabad.</p>
+            
+            <div class="flex gap-4">
+                <div class="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center backdrop-blur-sm">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
+                </div>
+                <div class="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center backdrop-blur-sm">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Side: Login Form -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-slate-50 relative">
+        <div class="max-w-md w-full">
+            <div class="mb-12 text-center lg:text-left">
+                <h1 class="text-4xl font-900 text-slate-900 mb-4">Welcome Back</h1>
+                <p class="text-slate-500 font-600">Enter your details to access your PhotographyHub portal.</p>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Google Login Button -->
+                <a href="{% provider_login_url 'google' %}" class="w-full h-16 border-2 border-slate-200 bg-white rounded-2xl flex items-center justify-center gap-4 font-800 text-slate-700 hover:border-blue-400 hover:bg-blue-50 transition-all shadow-sm">
+                    <img src="https://www.svgrepo.com/show/355037/google-icon.svg" class="w-6 h-6" alt="Google">
+                    Continue with Google
+                </a>
+
+                <div class="relative py-4">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+                    <div class="relative flex justify-center text-xs uppercase"><span class="bg-slate-50 px-4 text-slate-400 font-bold tracking-widest">or use email</span></div>
+                </div>
+
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-800 text-slate-700 mb-2 px-1 uppercase tracking-wider">Email Address</label>
+                        <input type="email" placeholder="name@example.com" class="w-full h-14 bg-white border-2 border-slate-100 rounded-2xl px-6 font-600 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-2 px-1">
+                            <label class="block text-sm font-800 text-slate-700 uppercase tracking-wider">Password</label>
+                            <a href="#" class="text-sm font-800 text-blue-600 hover:underline">Forgot?</a>
+                        </div>
+                        <input type="password" placeholder="••••••••" class="w-full h-14 bg-white border-2 border-slate-100 rounded-2xl px-6 font-600 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all">
+                    </div>
+                    
+                    <button type="button" class="w-full h-16 bg-blue-600 text-white rounded-2xl font-900 text-xl shadow-xl shadow-blue-200 hover:bg-blue-700 transition-all active:scale-[0.98]">
+                        Sign In
+                    </button>
+                </form>
+
+                <p class="text-center text-slate-500 font-600 pt-6">
+                    Don't have an account? 
+                    <a href="/photographer/join/" class="text-blue-600 font-800 hover:underline">Create one</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- Background Accent -->
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-blue-600/5 blur-[100px] rounded-full"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-600/5 blur-[120px] rounded-full"></div>
+    </div>
+</main>
+{% endblock %}

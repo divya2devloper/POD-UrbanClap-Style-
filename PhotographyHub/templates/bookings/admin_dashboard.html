@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="min-h-screen bg-[#fafbff]">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+            <h1 class="text-2xl font-900 text-slate-900 tracking-tight">Admin <span class="text-blue-600">Control Center</span></h1>
+            <div class="flex items-center gap-4">
+                <div class="px-4 py-2 bg-slate-50 rounded-xl flex items-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span class="text-xs font-800 text-slate-600">Platform Live</span>
+                </div>
+                <a href="/admin/" class="p-2 text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-10">
+        <!-- Platform Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                <span class="text-xs font-900 text-slate-400 uppercase tracking-widest block mb-4">Gross Revenue</span>
+                <h2 class="text-3xl font-900 text-slate-900">₹{{ stats.total_revenue|default:0 }}</h2>
+                <div class="mt-4 flex items-center gap-2 text-green-500 font-800 text-xs">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"></path></svg>
+                    <span>Above target</span>
+                </div>
+            </div>
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                <span class="text-xs font-900 text-slate-400 uppercase tracking-widest block mb-4">GST Collected</span>
+                <h2 class="text-3xl font-900 text-slate-900">₹{{ stats.total_gst|default:0 }}</h2>
+                <span class="text-slate-400 text-xs font-800 block mt-4">Payable Quarterly</span>
+            </div>
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                <span class="text-xs font-900 text-slate-400 uppercase tracking-widest block mb-4">Pending Payouts</span>
+                <h2 class="text-3xl font-900 text-blue-600">₹{{ stats.pending_payouts|default:0 }}</h2>
+                <span class="text-blue-400 text-xs font-800 block mt-4">Due within 7 days</span>
+            </div>
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                <span class="text-xs font-900 text-slate-400 uppercase tracking-widest block mb-4">Total Bookings</span>
+                <h2 class="text-3xl font-900 text-slate-900">{{ stats.total_bookings }}</h2>
+                <span class="text-slate-400 text-xs font-800 block mt-4">Platform Volume</span>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Charts Section -->
+            <div class="lg:col-span-2 space-y-8">
+                <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                    <div class="flex items-center justify-between mb-8">
+                        <h4 class="text-xl font-900 text-slate-900">Revenue Growth</h4>
+                        <div class="flex gap-2">
+                            <span class="flex items-center gap-2 text-xs font-800 text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Bookings</span>
+                            <span class="flex items-center gap-2 text-xs font-800 text-slate-400 px-3 py-1 rounded-full">Payouts</span>
+                        </div>
+                    </div>
+                    <div class="h-96 w-full">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-8 border-b border-slate-100">
+                        <h4 class="text-xl font-900 text-slate-900">Recent Activity</h4>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="bg-slate-50/50">
+                                    <th class="px-8 py-5 text-xs font-900 text-slate-400 uppercase tracking-widest">Booking</th>
+                                    <th class="px-8 py-5 text-xs font-900 text-slate-400 uppercase tracking-widest">Customer</th>
+                                    <th class="px-8 py-5 text-xs font-900 text-slate-400 uppercase tracking-widest">Photographer</th>
+                                    <th class="px-8 py-5 text-xs font-900 text-slate-400 uppercase tracking-widest">Amount</th>
+                                    <th class="px-8 py-5 text-xs font-900 text-slate-400 uppercase tracking-widest">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50 text-sm">
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="px-8 py-20 text-center">
+                                        <div class="relative inline-block overflow-hidden rounded-[2rem] bg-slate-50 border border-slate-100 group/empty max-w-lg mx-auto">
+                                            <img src="https://images.unsplash.com/photo-1540575861501-7ad060e39fe5?auto=format&fit=crop&w=800&q=80" class="w-full h-48 object-cover opacity-60 grayscale group-hover/empty:grayscale-0 transition-all duration-700" alt="No activity">
+                                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent flex items-center justify-center">
+                                                <div class="text-center p-6">
+                                                    <h5 class="text-white font-900 tracking-tight">System Ready & Synchronized</h5>
+                                                    <p class="text-white/70 text-[10px] font-bold uppercase tracking-widest mt-1">Awaiting first booking sequence</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Stats -->
+            <div class="space-y-8">
+                <div class="bg-slate-900 p-8 rounded-[2.5rem] shadow-2xl">
+                    <h4 class="text-xl font-900 text-white mb-6">Service Health</h4>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-white/60 text-xs font-900 uppercase">Redis Connection</span>
+                                <span class="text-green-400 text-xs font-900">99.9%</span>
+                            </div>
+                            <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-green-400 w-[99%] h-full"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-white/60 text-xs font-900 uppercase">Celery Workers</span>
+                                <span class="text-green-400 text-xs font-900">Active</span>
+                            </div>
+                            <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                                <div class="bg-green-400 w-full h-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                    <h4 class="text-xl font-900 text-slate-900 mb-6">Popular Categories</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-700 text-slate-600">Wedding</span>
+                            <span class="text-sm font-900 text-slate-900">42%</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-700 text-slate-600">Corporate</span>
+                            <span class="text-sm font-900 text-slate-900">28%</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-700 text-slate-600">Interior</span>
+                            <span class="text-sm font-900 text-slate-900">15%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            datasets: [{
+                label: 'Revenue',
+                data: [45000, 62000, 58000, 89000],
+                backgroundColor: '#2563eb',
+                borderRadius: 12,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { grid: { color: '#f1f5f9' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}

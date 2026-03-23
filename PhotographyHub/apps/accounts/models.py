@@ -12,6 +12,11 @@ class PhotographerProfile(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(60)],
         help_text="Maximum travel distance in kilometers from photographer home base.",
     )
+    categories = models.ManyToManyField("bookings.Category", related_name="photographers", blank=True)
+    
+    # Premium status
+    is_premium_partner = models.BooleanField(default=False, help_text="Entitles photographer to early notifications (5 min priority)")
+    premium_expiry = models.DateTimeField(null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.user} ({self.max_travel_radius} km)"

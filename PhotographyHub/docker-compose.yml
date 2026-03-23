@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  # 1. Database (Postgres)
+  # NOTE: If using Supabase directly, you can disable this service.
+  db:
+    image: postgres:15
+    container_name: photographyhub_db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - photographyhub_network
+
+  # 2. Redis (For Channels & Celery)
+  redis:
+    image: redis:7-alpine
+    container_name: photographyhub_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - photographyhub_network
+
+  # 3. Main Web Application
+  web:
+    build: .
+    container_name: photographyhub_web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_HOST=db
+      - REDIS_HOST=redis
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    networks:
+      - photographyhub_network
+
+  # 4. Celery Worker (Matching Engine)
+  celery-worker:
+    build: .
+    container_name: photographyhub_worker
+    command: celery -A core worker -l info
+    volumes:
+      - .:/app
+    environment:
+      - POSTGRES_HOST=db
+      - REDIS_HOST=redis
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    networks:
+      - photographyhub_network
+
+  # 5. Celery Beat (5-min Expansion)
+  celery-beat:
+    build: .
+    container_name: photographyhub_beat
+    command: celery -A core beat -l info
+    volumes:
+      - .:/app
+    environment:
+      - POSTGRES_HOST=db
+      - REDIS_HOST=redis
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    networks:
+      - photographyhub_network
+
+volumes:
+  postgres_data:
+
+networks:
+  photographyhub_network:
+    driver: bridge

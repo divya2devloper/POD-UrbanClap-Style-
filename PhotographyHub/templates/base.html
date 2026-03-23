@@ -1,0 +1,275 @@
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PhotographyHub • Premium Managed Services{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+        .carousel-track { display: flex; transition: transform 0.5s ease-in-out; }
+        .category-box:hover .zoom-img { transform: scale(1.05); }
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-slate-50 text-slate-900">
+
+    <!-- Fixed Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 glass border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+            <a href="/" class="text-2xl font-800 text-blue-700 tracking-tight">Photography<span class="text-slate-900">Hub</span></a>
+            
+            <nav class="hidden md:flex space-x-2">
+                {% block nav_items %}
+                <a href="/#categories" class="px-3 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-semibold hover:border-blue-400 hover:text-blue-600 transition-all">Explore Categories</a>
+                <a href="/photographer/join/" class="px-3 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-semibold hover:border-blue-400 hover:text-blue-600 transition-all">Join as Photographer</a>
+                {% endblock %}
+            </nav>
+
+            <button onclick="toggleModal('booking-modal')" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-blue-200 transition-all">
+                Book Now
+            </button>
+        </div>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <!-- Global Footer -->
+    <footer class="bg-slate-900 pt-20 pb-10 text-white overflow-hidden relative">
+        <div class="max-w-7xl mx-auto px-4 relative z-10 grid md:grid-cols-4 gap-12 border-b border-white/10 pb-16">
+            <div class="col-span-1 md:col-span-2">
+                <a href="/" class="text-3xl font-800 text-blue-400 mb-6 block">Photography<span class="text-white">Hub</span></a>
+                <p class="text-slate-400 text-lg max-w-sm mb-8 leading-relaxed">The premier managed service platform connecting Ahmedabad and Gandhinagar businesses and families with verified photography talent.</p>
+                <div class="flex gap-4">
+                    <button onclick="toggleModal('booking-modal')" class="bg-white text-slate-900 px-8 py-3 rounded-xl font-800 hover:bg-blue-100 transition-all">Book Now</button>
+                    <a href="/photographer/join/" class="border border-white/20 px-8 py-3 rounded-xl font-800 hover:bg-white/10 transition-all">Join as Photographer</a>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="text-blue-400 font-800 mb-6 uppercase tracking-widest text-sm">Platform</h4>
+                <ul class="space-y-4 text-slate-400 font-600">
+                    <li><a href="#" class="hover:text-white transition-colors">About Us</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Contact Support</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-blue-400 font-800 mb-6 uppercase tracking-widest text-sm">Direct Contact</h4>
+                <div class="space-y-4">
+                    <a href="mailto:hello@photographyhub.in" class="flex items-center gap-3 text-slate-300 hover:text-white">
+                        <svg class="w-5 h-5 opacity-60" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+                        hello@photographyhub.in
+                    </a>
+                    <a href="tel:+917940001234" class="flex items-center gap-3 text-slate-300 hover:text-white text-xl font-bold">
+                        <svg class="w-5 h-5 opacity-60" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+                        +91 79 4000 1234
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 py-8 flex flex-wrap justify-between items-center gap-4 text-slate-500 text-sm">
+            <span>© 2026 PhotographyHub — Ahmedabad & Gandhinagar. All Rights Reserved.</span>
+            <div class="hidden md:flex items-center gap-8">
+                <a href="{% url 'homepage' %}" class="text-slate-600 hover:text-blue-600 font-bold transition-colors">Find Shoots</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'photographer-dashboard' %}" class="text-slate-600 hover:text-blue-600 font-bold transition-colors">Earning Dashboard</a>
+                    {% if user.is_staff %}
+                        <a href="{% url 'admin-dashboard' %}" class="text-blue-600 font-bold transition-colors px-3 py-1 bg-blue-50 rounded-lg border border-blue-100 italic">Admin Panel</a>
+                    {% endif %}
+                    <a href="{% url 'customer-dashboard' %}" class="text-slate-600 hover:text-blue-600 font-bold transition-colors">My Bookings</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="absolute -bottom-1/2 -left-1/4 w-1/2 h-full bg-blue-600/10 blur-[120px] rounded-full"></div>
+    </footer>
+
+    <!-- Booking Modal -->
+    <div id="booking-modal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="toggleModal('booking-modal')"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-6">
+            <div class="bg-white rounded-[2.5rem] shadow-2xl overflow-hidden p-8">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-blue-600">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    </div>
+                    <h3 class="text-3xl font-800 text-slate-900">Secure Booking</h3>
+                    <p class="text-slate-500 mt-2">Login with your Google account to proceed and securely pay online.</p>
+                    <input type="hidden" id="category-id-input" value="">
+                    <input type="hidden" id="category-name-input" value="">
+
+                    <div id="category-select-wrapper" class="mt-6 space-y-4 text-left hidden">
+                        <label class="block text-sm font-800 text-slate-700 uppercase tracking-wider px-1">Select Category</label>
+                        <select id="modal-category-select" onchange="document.getElementById('category-id-input').value = this.value; document.getElementById('category-name-input').value = this.options[this.selectedIndex].text; updatePricePreview();" class="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-700 text-slate-900 focus:border-blue-500 outline-none transition-all">
+                            <option value="">Choose a niche...</option>
+                            {% for cat in category_blocks %}
+                                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mt-6 space-y-4 text-left">
+                        <label class="block text-sm font-800 text-slate-700 uppercase tracking-wider px-1">Select Duration</label>
+                        <select id="duration-select" onchange="updatePricePreview()" class="w-full h-14 bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 font-700 text-slate-900 focus:border-blue-500 outline-none transition-all">
+                            <option value="1">1 Hour (Quickie)</option>
+                            <option value="2">2 Hours (Standard Mini)</option>
+                            <option value="3">3 Hours (Essential)</option>
+                            <option value="4" selected>4 Hours (Standard)</option>
+                            <option value="6">6 Hours (Half Day+)</option>
+                            <option value="8">8 Hours (Full Day)</option>
+                        </select>
+                    </div>
+
+                    <div id="price-preview" class="mt-6 p-4 bg-blue-50 rounded-2xl border border-blue-100 hidden">
+                        <div class="flex justify-between text-sm font-700 text-blue-900 mb-1">
+                            <span>Base Price:</span>
+                            <span id="preview-base">₹0</span>
+                        </div>
+                        <div class="flex justify-between text-xs text-blue-600 mb-2">
+                            <span>GST (18%):</span>
+                            <span id="preview-gst">₹0</span>
+                        </div>
+                        <div class="border-t border-blue-200 pt-2 flex justify-between font-800 text-blue-950">
+                            <span>To Pay Now (10%):</span>
+                            <span id="preview-deposit">₹0</span>
+                        </div>
+                        <p class="text-[10px] text-blue-400 mt-2">*10% deposit is non-refundable. Balance work payout in 7 days.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <a href="{% provider_login_url 'google' %}" class="w-full h-14 border border-slate-200 rounded-2xl flex items-center justify-center gap-3 font-700 hover:bg-slate-50 transition-all font-outfit">
+                        <img src="https://www.svgrepo.com/show/355037/google-icon.svg" class="w-5 h-5" alt="Google">
+                        Sign in with Gmail
+                    </a>
+                    
+                    <div class="relative py-4">
+                        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-100"></div></div>
+                        <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400">Payment Requirement</span></div>
+                    </div>
+
+                    <div class="p-4 bg-orange-50 rounded-2xl border border-orange-100 flex items-start gap-4 ring-1 ring-orange-200/50">
+                        <div class="text-orange-600 pt-0.5">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <p class="text-xs text-orange-800 font-semibold leading-relaxed">
+                            To ensure photographer commitment, we only accept online payments. No cash on delivery.
+                        </p>
+                    </div>
+
+                    <button id="confirm-booking-btn" onclick="submitBooking()" class="w-full h-14 bg-blue-600 text-white rounded-2xl font-800 text-lg shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all">
+                        Confirm and Start Search
+                    </button>
+                </div>
+
+                <button onclick="toggleModal('booking-modal')" class="w-full mt-6 text-slate-400 font-bold hover:text-slate-600 text-sm">Cancel and Return</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global AJAX CSRF setup
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function updatePricePreview() {
+            const duration = parseInt(document.getElementById('duration-select').value);
+            const categoryName = document.getElementById('category-name-display').innerText;
+
+            // Wedding, Pre-Wedding, and Maternity share the same Premium tier
+            const isPremium = categoryName.includes('Wedding') || categoryName.includes('Maternity');
+            
+            const priceMap = {
+                "Premium": {1: 3000, 2: 5000, 3: 6500, 4: 8000, 6: 12000, 8: 16000},
+                "Normal": {1: 1500, 2: 2500, 3: 3500, 4: 4000, 6: 6000, 8: 8000}
+            };
+
+            const profile = isPremium ? "Premium" : "Normal";
+            const basePrice = priceMap[profile][duration] || (1500 * duration);
+            const gst = basePrice * 0.18;
+            const total = basePrice + gst;
+            const deposit = total * 0.10;
+            
+            document.getElementById('preview-base').innerText = '₹' + basePrice;
+            document.getElementById('preview-gst').innerText = '₹' + Math.round(gst);
+            document.getElementById('preview-deposit').innerText = '₹' + Math.round(deposit);
+        }
+
+        function toggleModal(modalId, categoryId = null, categoryName = null) {
+            const modal = document.getElementById(modalId);
+            const catWrapper = document.getElementById('category-select-wrapper');
+            
+            if (categoryId) {
+                document.getElementById('category-id-input').value = categoryId;
+                document.getElementById('category-name-input').value = categoryName || '';
+                catWrapper.classList.add('hidden');
+                document.getElementById('price-preview').classList.remove('hidden');
+                updatePricePreview();
+            } else {
+                // If opening from General 'Book Now'
+                document.getElementById('category-id-input').value = '';
+                document.getElementById('category-name-input').value = '';
+                catWrapper.classList.remove('hidden');
+                document.getElementById('price-preview').classList.add('hidden');
+            }
+            
+            modal.classList.toggle('hidden');
+            modal.classList.toggle('flex');
+            if (!modal.classList.contains('hidden')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+    
+    <!-- Maximized High-Impact Photographic Mosaic Background (Mashed) -->
+    <div class="fixed inset-0 -z-50 pointer-events-none opacity-[0.32] overflow-hidden select-none">
+        <div class="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-8 gap-4 auto-rows-[320px] -rotate-2 scale-105 origin-center filter contrast-150 brightness-110 saturate-150">
+            <img src="https://images.unsplash.com/photo-1542038783-0219c819321e?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem]" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] mt-16" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] -mt-10" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1492691523567-6170c8185b30?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] mt-24" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1520853502314-53907a97210e?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem]" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] -mt-20" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1493863641943-9b68992a8d07?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] mt-8" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1502472992487-44c7ff460d6a?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem]" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1554080353-a576cf803bda?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] mt-12" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] -mt-6" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] mt-28" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] -mt-16" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] mt-10" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1540575861501-7ad060e39fe5?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] -mt-18" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] mt-20" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem]" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] mt-14" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] -mt-8" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] mt-24" alt="Mosaiced photography">
+            <img src="https://images.unsplash.com/photo-1502472992487-44c7ff460d6a?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover rounded-[3rem] -mt-12" alt="Mosaiced photography">
+        </div>
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-50/0 via-slate-50/0 to-slate-50/10"></div>
+    </div>
+</body>
+</html>

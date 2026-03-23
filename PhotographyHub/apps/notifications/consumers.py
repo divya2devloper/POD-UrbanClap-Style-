@@ -8,7 +8,8 @@ class PhotographerPingConsumer(AsyncJsonWebsocketConsumer):
             await self.close()
             return
 
-        self.group_name = f"photographer_{user.id}"
+        # Matches the 'user_{id}' group used in tasks.py
+        self.group_name = f"user_{user.id}"
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
 
@@ -16,13 +17,16 @@ class PhotographerPingConsumer(AsyncJsonWebsocketConsumer):
         if hasattr(self, "group_name"):
             await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
-    async def booking_ping(self, event):
+    async def booking_alert(self, event):
+        """
+        Receives booking alerts from handle_booking_ping tasks.
+        """
         await self.send_json(
             {
-                "event": "ping",
+                "event": "booking_alert",
                 "booking_id": event["booking_id"],
-                "service_category": event.get("service_category", "General Photography"),
-                "distance_km": event["distance_km"],
-                "ping_radius_km": event["ping_radius_km"],
+                "category": event.get("category", "General Photography"),
+                "radius": event.get("radius", 5),
+                "message": event.get("message", "New Job available!")
             }
         )
