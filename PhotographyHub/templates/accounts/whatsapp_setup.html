@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Complete Your Profile • PhotographyHub{% endblock %}
+
+{% block nav_items %}
+<a href="/" class="px-3 py-1.5 rounded-full border border-slate-200 bg-white text-sm font-semibold hover:border-blue-400 hover:text-blue-600 transition-all">Back to Home</a>
+{% endblock %}
+
+{% block content %}
+<main class="min-h-screen pt-20 flex bg-white">
+    <!-- Left Side: Visual Mood -->
+    <div class="hidden lg:block w-1/2 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-br from-green-600/40 to-teal-900/60 z-10"></div>
+        <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=1200&q=80" 
+             alt="Camera Lens" 
+             class="absolute inset-0 w-full h-full object-cover">
+        
+        <div class="absolute inset-0 z-20 flex flex-col justify-end p-20 text-white">
+            <h2 class="text-6xl font-900 mb-6 leading-tight">Fast & Secure <br><span class="text-green-300">Communication.</span></h2>
+            <p class="text-xl text-green-100 max-w-sm font-600 mb-12">We use WhatsApp to send you instant booking confirmations, invoices, and photographer updates.</p>
+            
+            <div class="flex gap-4">
+                <div class="w-12 h-12 rounded-full border border-white/30 flex items-center justify-center backdrop-blur-sm">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.998 0C5.372 0 0 5.373 0 12c0 2.117.554 4.103 1.523 5.824L.057 23.882l6.222-1.434A11.93 11.93 0 0011.998 24C18.624 24 24 18.627 24 12S18.624 0 11.998 0zm0 21.818a9.79 9.79 0 01-4.988-1.365l-.358-.212-3.692.851.88-3.597-.233-.37A9.787 9.787 0 012.18 12c0-5.42 4.399-9.818 9.818-9.818 5.42 0 9.82 4.398 9.82 9.818 0 5.419-4.4 9.818-9.82 9.818z"/></svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Side: Form -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-8 bg-slate-50 relative">
+        <div class="max-w-md w-full">
+            <div class="mb-12 text-center lg:text-left">
+                <span class="inline-block px-4 py-1.5 rounded-full bg-green-50 text-green-600 text-xs font-900 uppercase tracking-widest mb-6 border border-green-100 italic">One step left</span>
+                <h1 class="text-4xl font-900 text-slate-900 mb-4">Complete Your Profile</h1>
+                <p class="text-slate-500 font-600">Hi {{ user.username }}, please provide your valid WhatsApp number to continue.</p>
+            </div>
+
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <div>
+                    <label class="block text-sm font-800 text-slate-700 mb-2 px-1 uppercase tracking-wider">WhatsApp Number</label>
+                    {{ form.whatsapp_number }}
+                    {% if form.whatsapp_number.errors %}
+                        <div class="mt-3 p-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm font-700">
+                            {{ form.whatsapp_number.errors.0 }}
+                        </div>
+                    {% endif %}
+                    <p class="mt-3 text-xs text-slate-400 font-bold px-1 italic">* Use international format, e.g. +91 98765 43210</p>
+                </div>
+
+                <div class="p-4 bg-blue-50 rounded-2xl border border-blue-100 flex items-start gap-4">
+                    <div class="text-blue-600 pt-0.5">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <p class="text-xs text-blue-800 font-semibold leading-relaxed">
+                        Your data is safe. We only use this number to send you important platform notifications and GST invoices.
+                    </p>
+                </div>
+
+                <button type="submit" class="w-full h-16 bg-green-600 text-white rounded-2xl font-900 text-xl shadow-xl shadow-green-200 hover:bg-green-700 transition-all active:scale-[0.98]">
+                    Save & Continue
+                </button>
+            </form>
+
+            <p class="text-center text-slate-500 font-600 pt-8">
+                Signed in as <span class="text-slate-900 font-800">{{ user.email }}</span>
+            </p>
+        </div>
+
+        <!-- Background Accent -->
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-green-600/5 blur-[100px] rounded-full"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-teal-600/5 blur-[120px] rounded-full"></div>
+    </div>
+</main>
+{% endblock %}

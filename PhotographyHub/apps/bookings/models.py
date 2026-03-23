@@ -53,13 +53,24 @@ class Booking(models.Model):
         blank=True
     )
     customer_name = models.CharField(max_length=120, blank=True)
+    customer_whatsapp = models.CharField(max_length=15, blank=True, help_text="WhatsApp number with country code e.g. +919876543210")
     customer_address = models.CharField(max_length=255, blank=True)
+    event_purpose = models.CharField(max_length=255, blank=True, help_text="Purpose / description of the event")
+    event_location = models.CharField(max_length=500, blank=True, help_text="Full venue / address of the event")
     customer_latitude = models.DecimalField(max_digits=9, decimal_places=6)
     customer_longitude = models.DecimalField(max_digits=9, decimal_places=6)
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="bookings", null=True, blank=True)
     
+    # Event Classification
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name="bookings")
+    
+    # Service Selection
+    has_photo = models.BooleanField(default=False)
+    has_video = models.BooleanField(default=False)
+    has_shorts = models.BooleanField(default=False)
+    has_drone = models.BooleanField(default=False)
+
     # Duration Logic
-    duration_hours = models.IntegerField(choices=Duration.choices, default=Duration.FOUR_HOURS)
+    duration_hours = models.IntegerField(default=4)
     
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     current_ping_radius = models.PositiveIntegerField(
@@ -77,14 +88,35 @@ class Booking(models.Model):
     )
     
     # Financials
-    base_price = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    subtotal_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, help_text="Total before discounts")
+    discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, help_text="Duration discount amount")
+    first_order_discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, help_text="First order 5% discount")
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    
+    base_price = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, help_text="Price after all discounts but before GST")
     gst_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     deposit_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, help_text="10% Non-refundable")
     is_deposit_paid = models.BooleanField(default=False)
     
+    # QR Tracking & Time Management
+    scheduled_time = models.DateTimeField(null=True, blank=True)
+    start_qr_scanned_at = models.DateTimeField(null=True, blank=True)
+    end_qr_scanned_at = models.DateTimeField(null=True, blank=True)
+    
+    # Penalties & Overtime
+    arrival_penalty_applied = models.BooleanField(default=False)
+    upload_penalty_applied = models.BooleanField(default=False)
+    overtime_charges = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    
+    # Post-Shoot
+    gallery_link1 = models.URLField(blank=True, null=True)
+    gallery_link2 = models.URLField(blank=True, null=True)
+    gallery_link3 = models.URLField(blank=True, null=True)
+    
     # Payout to Photographer
     payout_ready_at = models.DateTimeField(null=True, blank=True, help_text="Scheduled payout date (7 days after work)")
+    payout_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
     is_payout_completed = models.BooleanField(default=False)
 
     # Search Logic Extras
@@ -100,13 +132,45 @@ class Booking(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def calculate_payout(self):
+        """
+        Final Payout: Calculate Base Fee - Arrival Penalty (10%) - Upload Penalty (20%) + Overtime Charges (Client).
+        Note: The penalty is calculated on the Base Fee.
+        """
+        payout = self.base_price
+        
+        if self.arrival_penalty_applied:
+            payout -= self.base_price * Decimal('0.10')
+            
+        if self.upload_penalty_applied:
+            payout -= self.base_price * Decimal('0.20')
+            
+        # Overtime charges are added to the payout (paid by client, passed to photographer? 
+        # Requirement says: Calculate Base Fee - Arrival Penalty (10%) - Upload Penalty (20%) + Overtime Charges (Client).
+        payout += self.overtime_charges
+        
+        return max(payout, Decimal('0.00'))
+
     def save(self, *args, **kwargs):
         # Auto-calculate GST and Total if not set
+        # We assume base_price is set before saving by the view calculations
         if self.base_price > 0:
             self.gst_amount = self.base_price * Decimal('0.18')
             self.total_amount = self.base_price + self.gst_amount
             self.deposit_amount = self.total_amount * Decimal('0.10')
+            
+        # Update payout amount
+        self.payout_amount = self.calculate_payout()
+        
         super().save(*args, **kwargs)
+
+    def get_services_str(self):
+        services = []
+        if self.has_photo: services.append("Photo")
+        if self.has_video: services.append("Video")
+        if self.has_shorts: services.append("Shorts")
+        if self.has_drone: services.append("Drone")
+        return ", ".join(services) or "Photography"
 
     def __str__(self) -> str:
         return f"Booking #{self.pk} - {self.status}"

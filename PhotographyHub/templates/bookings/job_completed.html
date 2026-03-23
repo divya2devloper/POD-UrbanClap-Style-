@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="card-body p-5 text-center">
+            <div class="mb-4">
+                <i class="fas fa-check-double fa-5x text-primary"></i>
+            </div>
+            <h1 class="display-4 fw-bold mb-3">Job Completed!</h1>
+            <p class="lead mb-4">Thank you for using PhotographyHub. <strong>Booking #{{ booking.id }}</strong> is now marked as finished.</p>
+            
+            {% if overtime_charges > 0 %}
+            <div class="alert alert-info border-0 rounded-3 p-4 mb-4 shadow-sm text-start">
+                <h4 class="alert-heading fw-bold"><i class="fas fa-clock me-2"></i> Overtime Detected</h4>
+                <p>The shoot exceeded the contracted duration (plus 15 min buffer). The system has calculated an additional charge of <strong>₹{{ overtime_charges }}</strong>.</p>
+                <hr>
+                <div class="d-flex align-items-center justify-content-between">
+                    <span>Final Overtime Bill: <strong>₹{{ overtime_charges }}</strong></span>
+                    {% if razorpay_link %}
+                    <a href="{{ razorpay_link }}" class="btn btn-dark rounded-pill px-4">Pay Overtime via Razorpay</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="mt-4">
+                <p class="text-muted">The photographer will upload the gallery links within 48 hours. You will be notified once they are available.</p>
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+                    <a href="{% url 'generate-invoice' booking.id %}" class="btn btn-outline-primary btn-lg px-4 rounded-pill">View GST Invoice</a>
+                    <a href="{% url 'customer-dashboard' %}" class="btn btn-primary btn-lg px-4 rounded-pill">Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

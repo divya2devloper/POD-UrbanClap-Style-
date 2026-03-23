@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Review • Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+    <nav class="h-16 bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 h-full flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="{% url 'admin-dashboard' %}" class="text-slate-500 hover:text-slate-900 font-bold text-sm">← Back to Analytics</a>
+                <h1 class="text-lg font-900 tracking-tight border-l pl-4 border-slate-200">Portfolio Review</h1>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 py-10">
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-6 p-4 rounded-xl {% if message.tags == 'success' %}bg-green-50 text-green-700 border-green-100{% else %}bg-orange-50 text-orange-700 border-orange-100{% endif %} border font-800 text-sm">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="space-y-12">
+            
+            <!-- Pending Items -->
+            <section>
+                <div class="flex items-center gap-3 mb-6">
+                    <h2 class="text-2xl font-900">Pending Review</h2>
+                    <span class="px-3 py-1 bg-blue-100 text-blue-600 text-xs font-900 rounded-full">{{ pending_items|length }} Items</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {% for item in pending_items %}
+                    <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        <img src="{{ item.image.url }}" class="w-full h-64 object-cover">
+                        <div class="p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h4 class="font-800 text-slate-900">{{ item.photographer.user.username }}</h4>
+                                    <p class="text-xs font-700 text-slate-400 uppercase tracking-widest">{{ item.category.name }}</p>
+                                </div>
+                                <span class="text-[10px] font-900 text-slate-300">#{{ item.id }}</span>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <form method="POST" class="flex-1">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <input type="hidden" name="action" value="approve">
+                                    <button type="submit" class="w-full py-3 bg-slate-900 text-white rounded-xl font-800 text-xs hover:bg-blue-600 transition-all">Approve</button>
+                                </form>
+                                <form method="POST" class="flex-1">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <input type="hidden" name="action" value="feature">
+                                    <button type="submit" class="w-full py-3 bg-blue-50 text-blue-600 rounded-xl font-800 text-xs hover:bg-blue-600 hover:text-white transition-all">Feature</button>
+                                </form>
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <input type="hidden" name="action" value="reject">
+                                    <button type="submit" class="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-span-full py-20 text-center bg-white border border-slate-200 rounded-[3rem]">
+                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                        <h3 class="text-xl font-900 text-slate-400">All caught up!</h3>
+                        <p class="text-sm font-700 text-slate-300">No pending portfolio reviews at the moment.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Approved History (Summary) -->
+            <section>
+                <h2 class="text-2xl font-900 mb-6">Recently Approved</h2>
+                <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-slate-50/50 border-b border-slate-100">
+                                <th class="px-8 py-5 text-xs font-900 text-slate-400 uppercase tracking-widest">Photographer</th>
+                                <th class="px-8 py-5 text-xs font-900 text-slate-400 uppercase tracking-widest">Category</th>
+                                <th class="px-8 py-5 text-xs font-900 text-slate-400 uppercase tracking-widest">Main Gallery</th>
+                                <th class="px-8 py-5 text-xs font-900 text-slate-400 uppercase tracking-widest">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50">
+                            {% for item in approved_items %}
+                            <tr>
+                                <td class="px-8 py-4 font-800 text-slate-900">{{ item.photographer.user.username }}</td>
+                                <td class="px-8 py-4"><span class="px-2 py-1 bg-slate-100 rounded-lg text-[10px] font-900 text-slate-500 uppercase">{{ item.category.name }}</span></td>
+                                <td class="px-8 py-4">
+                                    {% if item.is_main_gallery %}
+                                        <span class="text-green-600 font-900 text-xs flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-green-600"></div> Featured</span>
+                                    {% else %}
+                                        <span class="text-slate-300 font-800 text-xs">Profile Only</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-8 py-4">
+                                    <form method="POST">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input type="hidden" name="action" value="reject">
+                                        <button type="submit" class="text-red-500 text-xs font-900 hover:underline">Revoke</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </main>
+</body>
+</html>

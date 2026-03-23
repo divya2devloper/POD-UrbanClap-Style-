@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load socialaccount %}
+
+{% block title %}Sign In Via Google • PhotographyHub{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center pt-24 pb-16 px-4">
+    <div class="w-full max-w-sm">
+        <!-- Card -->
+        <div class="bg-white rounded-[2.5rem] shadow-2xl p-8">
+            <!-- Logo / Icon -->
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-16 h-16 bg-blue-50 rounded-3xl flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-extrabold text-slate-900">Sign In to PhotographyHub</h1>
+                <p class="text-sm text-slate-500 mt-1 text-center">You are about to sign in using your Google account.</p>
+            </div>
+
+            <!-- Continue Button (this triggers the actual redirect) -->
+            <form method="post" action="{% provider_login_url 'google' %}">
+                {% csrf_token %}
+                <button type="submit" class="w-full h-14 border-2 border-slate-100 rounded-2xl flex items-center justify-center gap-3 font-bold text-slate-800 hover:bg-slate-50 hover:border-blue-300 transition-all text-base">
+                    <img src="https://www.svgrepo.com/show/355037/google-icon.svg" class="w-5 h-5" alt="Google">
+                    Continue with Google
+                </button>
+            </form>
+
+            <p class="text-center text-xs text-slate-400 mt-6">
+                By continuing, you agree to our Terms of Service and Privacy Policy.
+            </p>
+
+            <div class="mt-6 border-t border-slate-50 pt-6 text-center">
+                <a href="/" class="text-sm text-slate-500 hover:text-blue-600 font-semibold transition-colors">← Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

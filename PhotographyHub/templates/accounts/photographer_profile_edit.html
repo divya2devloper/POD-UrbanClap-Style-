@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Profile • PhotographyHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+        .tab-active { @apply border-blue-600 text-blue-600; }
+        
+        /* Mobile Only Overlay */
+        #mobile-only-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #0f172a;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (min-width: 1024px) {
+            #mobile-only-overlay { display: flex; }
+            body { overflow: hidden; }
+        }
+        
+        /* Smooth Transitions */
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .transition-all { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+    <!-- Mobile Only Overlay -->
+    <div id="mobile-only-overlay">
+        <div class="max-w-md w-full p-10 rounded-[3rem] bg-slate-800 border-4 border-blue-600 shadow-2xl">
+            <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-blue-500/50">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            </div>
+            <h2 class="text-3xl font-900 mb-4 leading-tight">Mobile Experience Only</h2>
+            <p class="text-slate-400 font-700 text-lg mb-8 leading-relaxed">
+                This professional dashboard is exclusively designed for mobile and tablet devices.
+            </p>
+            <div class="p-6 bg-slate-900 rounded-3xl border border-slate-700 text-left">
+                <p class="text-xs font-800 text-blue-400 uppercase tracking-widest mb-2">How to access:</p>
+                <ul class="text-sm font-600 text-slate-300 space-y-2">
+                    <li class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                        Open on your smartphone/tablet
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                        Resize browser to a mobile width
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <nav class="h-20 glass border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-6 h-full flex items-center justify-between">
+            <a href="{% url 'photographer-dashboard' %}" class="flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                <span class="font-700">Dashboard</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <button onclick="requestNotifications()" id="notif-btn" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-50 text-orange-600 font-800 text-xs border border-orange-100 hover:bg-orange-600 hover:text-white transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    Enable Job Alerts
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-6 py-8">
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-6 p-4 rounded-2xl {% if message.tags == 'success' %}bg-green-50 text-green-700 border-green-100{% else %}bg-red-50 text-red-700 border-red-100{% endif %} border font-700 text-sm animate-pulse">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            
+            <!-- Sidebar: Navigation -->
+            <div class="lg:col-span-1 space-y-4">
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm sticky top-28">
+                    <h3 class="text-xs font-900 text-slate-400 uppercase tracking-widest mb-6 px-2">Manage Profile</h3>
+                    <nav class="space-y-2">
+                        <button onclick="switchTab('profile')" id="btn-profile" class="w-full flex items-center gap-3 p-4 rounded-2xl font-800 text-sm transition-all text-blue-600 bg-blue-50 border border-blue-100">
+                             Professional Details
+                        </button>
+                        <button onclick="switchTab('portfolio')" id="btn-portfolio" class="w-full flex items-center gap-3 p-4 rounded-2xl font-800 text-sm transition-all text-slate-500 hover:bg-slate-50 border border-transparent">
+                             Portfolio Showcase
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="lg:col-span-2">
+                
+                <!-- Profile Tab -->
+                <div id="tab-profile" class="space-y-8">
+                    <div class="bg-white rounded-[2.5rem] border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-8 md:p-10">
+                            <form method="POST" enctype="multipart/form-data" class="space-y-8">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="update_profile">
+                                
+                                <div class="flex items-center gap-6 p-6 bg-slate-50 rounded-3xl border border-slate-100">
+                                    <div class="w-20 h-20 rounded-2xl bg-blue-100 flex-shrink-0 overflow-hidden border-4 border-white shadow-lg">
+                                        {% if profile.profile_picture %}
+                                            <img src="{{ profile.profile_picture.url }}" class="w-full h-full object-cover">
+                                        {% else %}
+                                            <div class="w-full h-full flex items-center justify-center text-blue-500">
+                                                <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex-1">
+                                        <label class="block text-[10px] font-900 text-slate-400 uppercase tracking-widest mb-2">Change Avatar</label>
+                                        {{ form.profile_picture }}
+                                    </div>
+                                </div>
+
+                                <div class="space-y-6">
+                                    <div>
+                                        <label class="block text-xs font-900 text-slate-400 uppercase tracking-widest mb-3">Bio / Brand Story</label>
+                                        {{ form.bio }}
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-6">
+                                        <div>
+                                            <label class="block text-xs font-900 text-slate-400 uppercase tracking-widest mb-3">Exp (Years)</label>
+                                            {{ form.experience_years }}
+                                        </div>
+                                        <div>
+                                            <label class="block text-xs font-900 text-slate-400 uppercase tracking-widest mb-3">Travel Radius</label>
+                                            {{ form.max_travel_radius }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="p-6 bg-slate-50 rounded-[2.5rem] border border-slate-200">
+                                        <label class="block text-xs font-900 text-slate-400 uppercase tracking-widest mb-4 px-2">Your Expertise & Services</label>
+                                        <div class="expertise-grid-container px-2">
+                                            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
+                                                {% for checkbox in form.categories %}
+                                                    <label class="flex items-center gap-3 p-3 rounded-2xl border border-transparent hover:bg-white hover:border-slate-100 transition-all cursor-pointer group">
+                                                        <div class="relative flex items-center justify-center">
+                                                            {{ checkbox.tag }}
+                                                            <div class="w-5 h-5 border-2 border-slate-300 rounded-lg group-hover:border-blue-500 transition-colors bg-white flex items-center justify-center">
+                                                                <svg class="w-3.5 h-3.5 text-blue-600 scale-0 transition-transform peer-checked:scale-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                                            </div>
+                                                        </div>
+                                                        <span class="text-sm font-700 text-slate-600 group-hover:text-blue-600 transition-colors">{{ checkbox.choice_label }}</span>
+                                                    </label>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                        <p class="mt-4 text-[10px] font-700 text-slate-400 px-2 leading-relaxed italic">
+                                            * Selecting your expertise prioritizes you for jobs in these specific fields. Ensure you select both event types (e.g. Wedding) and core services (e.g. Photos).
+                                        </p>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-900 text-slate-400 uppercase tracking-widest mb-3">Custom specialties (Comma separated)</label>
+                                        {{ form.specialties }}
+                                    </div>
+
+                                    {% if profile.is_premium_partner %}
+                                    <div class="p-6 bg-blue-600 rounded-3xl text-white shadow-xl shadow-blue-200 flex items-center justify-between">
+                                        <div>
+                                            <h4 class="text-lg font-900 mb-1">Premium Partner Active</h4>
+                                            <p class="text-blue-100 text-xs font-700">You get a 10-minute priority head start on all matching jobs!</p>
+                                        </div>
+                                        <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
+                                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.27 5.82 21 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                    <div class="p-6 bg-slate-100 rounded-3xl border border-slate-200 flex items-center justify-between opacity-70 grayscale">
+                                        <div>
+                                            <h4 class="text-lg font-900 text-slate-800 mb-1">Standard Partner</h4>
+                                            <p class="text-slate-500 text-xs font-700">Upgrade to Premium for 10-minute early job access.</p>
+                                        </div>
+                                        <button type="button" class="px-6 py-2 bg-slate-800 text-white rounded-xl text-xs font-900">UPGRADE</button>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <button type="submit" class="w-full h-16 bg-blue-600 text-white rounded-2xl font-800 shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">
+                                    Save Core Profile
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolio Tab -->
+                <div id="tab-portfolio" class="hidden space-y-8">
+                    
+                    <!-- Upload Box -->
+                    <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm">
+                        <h3 class="text-xl font-900 mb-6 underline decoration-blue-500 decoration-4 underline-offset-8">Add to Portfolio</h3>
+                        <form method="POST" enctype="multipart/form-data" class="grid gap-6">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="upload_portfolio">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {{ portfolio_form.category }}
+                                {{ portfolio_form.image }}
+                            </div>
+                            <button type="submit" class="h-14 bg-slate-900 text-white rounded-2xl font-800 hover:bg-blue-600 transition-all">
+                                Upload to Category Gallery
+                            </button>
+                            <p class="text-center text-[10px] font-700 text-slate-400 italic">Limit: 10 high-resolution items per category.</p>
+                        </form>
+                    </div>
+
+                    <!-- Portfolio Browser -->
+                    <div class="space-y-12">
+                        {% for cat_group in category_data %}
+                        <section>
+                            <div class="flex items-center justify-between mb-4 px-2">
+                                <h4 class="text-lg font-900 text-slate-800">{{ cat_group.obj.name }}</h4>
+                                <span class="text-[10px] font-900 px-2 py-1 bg-slate-100 rounded-lg text-slate-500 uppercase tracking-widest">
+                                    {{ cat_group.count }}/10 Items
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                {% for item in cat_group.items %}
+                                    <div class="aspect-square rounded-2xl overflow-hidden relative group border border-slate-200">
+                                        <img src="{{ item.image.url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                                        <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3">
+                                            {% if item.is_approved %}
+                                                <span class="px-3 py-1 bg-green-500 text-white text-[10px] font-900 rounded-full">APPROVED</span>
+                                            {% else %}
+                                                <span class="px-3 py-1 bg-orange-500 text-white text-[10px] font-900 rounded-full">PENDING</span>
+                                            {% endif %}
+                                            <form method="POST">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="action" value="delete_portfolio">
+                                                <input type="hidden" name="item_id" value="{{ item.id }}">
+                                                <button type="submit" class="p-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                {% empty %}
+                                    <div class="col-span-full py-8 text-center bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl">
+                                        <p class="text-xs font-700 text-slate-400">No showcase items for {{ cat_group.obj.name }} yet.</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </section>
+                        {% endfor %}
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script shadow>
+        function switchTab(tabId) {
+            document.getElementById('tab-profile').classList.add('hidden');
+            document.getElementById('tab-portfolio').classList.add('hidden');
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+            // Update buttons
+            document.getElementById('btn-profile').classList.remove('text-blue-600', 'bg-blue-50', 'border-blue-100');
+            document.getElementById('btn-portfolio').classList.remove('text-blue-600', 'bg-blue-50', 'border-blue-100');
+            document.getElementById('btn-profile').classList.add('text-slate-500', 'hover:bg-slate-50');
+            document.getElementById('btn-portfolio').classList.add('text-slate-500', 'hover:bg-slate-50');
+
+            document.getElementById('btn-' + tabId).classList.remove('text-slate-500', 'hover:bg-slate-50');
+            document.getElementById('btn-' + tabId).classList.add('text-blue-600', 'bg-blue-50', 'border-blue-100');
+        }
+
+        async function requestNotifications() {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                document.getElementById('notif-btn').classList.replace('bg-orange-50', 'bg-green-50');
+                document.getElementById('notif-btn').classList.replace('text-orange-600', 'text-green-600');
+                document.getElementById('notif-btn').innerText = 'Job Alerts Active';
+            }
+        }
+
+        // Auto-check on load
+        if ('Notification' in window && Notification.permission === 'granted') {
+            document.getElementById('notif-btn').classList.replace('bg-orange-50', 'bg-green-50');
+            document.getElementById('notif-btn').classList.replace('text-orange-600', 'text-green-600');
+            document.getElementById('notif-btn').innerText = 'Job Alerts Active';
+        }
+    </script>
+</body>
+</html>

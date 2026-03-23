@@ -50,3 +50,35 @@ def haversine_distance_km(lat1: float, lon1: float, lat2: float, lon2: float) ->
     a = sin(d_lat / 2) ** 2 + cos(lat1_rad) * cos(lat2_rad) * sin(d_lon / 2) ** 2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return earth_radius_km * c
+
+
+import qrcode
+import io
+import base64
+from django.core.signing import Signer
+from django.urls import reverse
+from django.conf import settings
+
+signer = Signer()
+
+def generate_signed_qr_base64(booking_id, action_type="arrival"):
+    """
+    Generate a QR code as a base64 string for a signed URL.
+    action_type: "arrival" or "completion"
+    """
+    path = reverse(f"{action_type}_qr_scan", kwargs={"booking_id": booking_id})
+    signed_value = signer.sign(f"{booking_id}:{action_type}")
+    
+    # Base URL should be the actual domain in production
+    domain = getattr(settings, "SITE_DOMAIN", "http://localhost:8000")
+    full_url = f"{domain}{path}?token={signed_value}"
+    
+    # Generate QR Code
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(full_url)
+    qr.make(fit=True)
+    
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffered = io.BytesIO()
+    img.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode()

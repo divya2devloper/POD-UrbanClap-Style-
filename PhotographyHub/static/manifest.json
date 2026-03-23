@@ -1,0 +1,21 @@
+{
+  "name": "PhotographyHub for Photographers",
+  "short_name": "PhotoHub",
+  "description": "Professional dashboard for photographers to manage jobs and profile.",
+  "start_url": "/photographer/dashboard/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=192&q=80",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&w=512&q=80",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

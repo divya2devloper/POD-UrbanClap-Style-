@@ -55,6 +55,33 @@
         </div>
     </section>
 
+    <!-- Professional Spotlight (Featured Gallery) -->
+    {% if featured_work %}
+    <section class="max-w-7xl mx-auto px-4 py-16">
+        <div class="flex flex-col md:flex-row items-end justify-between mb-10 gap-4">
+            <div>
+                <span class="text-xs font-900 text-blue-600 uppercase tracking-[0.3em] mb-3 block">Curation Elite</span>
+                <h2 class="text-4xl font-900 text-slate-900 tracking-tight">Professional Spotlight</h2>
+                <p class="text-slate-400 font-700 text-sm mt-2">Hand-picked masterpieces from our top-rated photographers.</p>
+            </div>
+            <a href="#categories" class="px-6 py-3 bg-slate-900 text-white rounded-xl font-800 text-xs hover:bg-blue-600 transition-all">View All Categories</a>
+        </div>
+        
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for item in featured_work %}
+            <div class="group relative aspect-[4/5] rounded-[2rem] overflow-hidden border border-slate-200 shadow-sm">
+                <img src="{{ item.image.url }}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                <div class="absolute bottom-6 left-6 right-6">
+                    <span class="px-2 py-0.5 bg-blue-600 text-white text-[9px] font-900 rounded-md uppercase tracking-wider mb-2 inline-block">{{ item.category.name }}</span>
+                    <p class="text-white font-800 text-sm">Shot by {{ item.photographer.user.username }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
     <!-- Category Grid Navigation -->
     <section id="categories" class="max-w-7xl mx-auto px-4 py-16">
         <h2 class="text-3xl font-800 mb-10 text-slate-800 flex items-center gap-3">
@@ -175,52 +202,4 @@
 </main>
 {% endblock %}
 {% block extra_js %}
-<script>
-    async function submitBooking() {
-        const categoryId = document.getElementById('category-id-input').value;
-        const durationHours = document.getElementById('duration-select').value;
-        const btn = document.getElementById('confirm-booking-btn');
-        const originalText = btn.innerText;
-        
-        if (!categoryId) {
-            alert('Please select a category first.');
-            return;
-        }
-
-        btn.innerText = 'Creating Request...';
-        btn.disabled = true;
-
-        try {
-            const response = await fetch('/bookings/create/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: `category_id=${categoryId}&duration_hours=${durationHours}`
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert('Success! ' + data.detail);
-                toggleModal('booking-modal');
-                // Optional: Redirect to a status page or refresh
-            } else {
-                if (response.status === 401) {
-                    alert('Please login first to book a photographer.');
-                    // In a real app, redirect to login
-                } else {
-                    alert('Error: ' + data.detail);
-                }
-            }
-        } catch (error) {
-            console.error('Booking error:', error);
-            alert('Something went wrong. Please try again.');
-        } finally {
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }
-    }
-</script>
 {% endblock %}

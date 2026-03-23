@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+        <div class="card-header bg-dark text-white p-4 bo0">
+            <h3 class="mb-0"><i class="fas fa-cloud-upload-alt me-2"></i> Upload Gallery Links</h3>
+            <p class="mb-0 text-white-50 small">Booking #{{ booking.id }} | Deadline: 48 Hours from Completion</p>
+        </div>
+        <div class="card-body p-4">
+            <form action="{% url 'upload-gallery' booking.id %}" method="post">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Gallery Link 1 (Main Selection)</label>
+                    <input type="url" name="link1" class="form-control rounded-3" placeholder="https://..." value="{{ booking.gallery_link1|default:'' }}" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Gallery Link 2 (Raw/Extra)</label>
+                    <input type="url" name="link2" class="form-control rounded-3" placeholder="https://..." value="{{ booking.gallery_link2|default:'' }}" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Gallery Link 3 (Video/Bonus)</label>
+                    <input type="url" name="link3" class="form-control rounded-3" placeholder="https://..." value="{{ booking.gallery_link3|default:'' }}" required>
+                </div>
+                
+                <div class="alert alert-warning border-0 rounded-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Important:</strong> You must upload 3 distinct links within 48 hours of job completion to avoid a 20% payout penalty.
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-success btn-lg rounded-pill p-3 fw-bold shadow-sm">
+                        Confirm & Save Links
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
